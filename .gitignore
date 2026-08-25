@@ -1,0 +1,35 @@
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Raw dataset
+data/raw/
+
+# Processed data
+data/processed/
+
+# MLflow
+mlruns/
+
+# Generated results
+results/
+
+# Model checkpoints
+*.pt
+*.pth
+
+# Environment files
+.env
