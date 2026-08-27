@@ -33,3 +33,6 @@ results/
 
 # Environment files
 .env
+
+# MLflow local database
+mlflow.db
