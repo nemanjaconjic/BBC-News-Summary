@@ -2,6 +2,7 @@ from pathlib import Path
 import re
 
 import pandas as pd
+import nltk
 
 CATEGORIES = [
     "business",
@@ -10,6 +11,13 @@ CATEGORIES = [
     "sport",
     "tech",
 ]
+
+def ensure_nltk_resources() -> None:
+    """Download required NLTK resources if they are missing."""
+    try:
+        nltk.data.find("tokenizers/punkt_tab")
+    except LookupError:
+        nltk.download("punkt_tab", quiet=True)
 
 def read_text_file(path: Path) -> str:
     """Read a UTF-8 text file and remove leading/trailing whitespace."""
@@ -29,17 +37,13 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 def split_sentences(text: str) -> list[str]:
-    """Split text into sentences using simple punctuation rules."""
-    text = clean_text(text)
+    """Split text into sentences using NLTK."""
 
-    sentences = re.split(
-        r"(?<=[.!?])\s+",
-        text
-    )
+    text = clean_text(text)
 
     return [
         sentence.strip()
-        for sentence in sentences
+        for sentence in nltk.sent_tokenize(text)
         if sentence.strip()
     ]
 
@@ -101,6 +105,8 @@ def preprocess_dataset(df: pd.DataFrame) -> pd.DataFrame:
 
 def main() -> None:
     """Run the complete preprocessing pipeline."""
+
+    ensure_nltk_resources()
 
     project_root = Path(__file__).resolve().parent.parent
     data_dir = project_root / "data" / "raw"
