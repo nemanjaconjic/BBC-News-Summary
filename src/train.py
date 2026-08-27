@@ -185,15 +185,7 @@ def measure_inference_time(
 
 def main() -> None:
 
-    # --------------------------------------------------
-    # Reproducibility
-    # --------------------------------------------------
-
     set_seed()
-
-    # --------------------------------------------------
-    # Paths
-    # --------------------------------------------------
 
     project_root = Path(__file__).resolve().parent.parent
 
@@ -226,29 +218,17 @@ def main() -> None:
         exist_ok=True,
     )
 
-    # --------------------------------------------------
-    # Load dataset
-    # --------------------------------------------------
-
     print("Loading dataset...")
 
     df = pd.read_pickle(dataset_path)
 
     print(f"Records: {len(df)}")
 
-    # --------------------------------------------------
-    # Create article groups
-    # --------------------------------------------------
-
     groups = create_groups(df)
 
     group_kfold = GroupKFold(
         n_splits=N_SPLITS
     )
-
-    # --------------------------------------------------
-    # Use only Fold 1 for baseline testing
-    # --------------------------------------------------
 
     train_idx, val_idx = next(
         group_kfold.split(
@@ -269,9 +249,6 @@ def main() -> None:
         f"Validation records: {len(val_df)}"
     )
 
-    # --------------------------------------------------
-    # Build vocabulary using TRAINING DATA ONLY
-    # --------------------------------------------------
 
     print("\nBuilding vocabulary...")
 
@@ -284,9 +261,6 @@ def main() -> None:
         f"Vocabulary size: {len(vocab)}"
     )
 
-    # --------------------------------------------------
-    # Create PyTorch datasets
-    # --------------------------------------------------
 
     train_dataset = BBCSentenceDataset(
         dataframe=train_df,
@@ -300,10 +274,6 @@ def main() -> None:
         max_length=MAX_LENGTH,
     )
 
-    # --------------------------------------------------
-    # Create DataLoaders
-    # --------------------------------------------------
-
     train_loader = DataLoader(
         train_dataset,
         batch_size=BATCH_SIZE,
@@ -316,9 +286,6 @@ def main() -> None:
         shuffle=False,
     )
 
-    # --------------------------------------------------
-    # Device
-    # --------------------------------------------------
 
     device = torch.device(
         "cuda"
@@ -328,9 +295,6 @@ def main() -> None:
 
     print(f"\nDevice: {device}")
 
-    # --------------------------------------------------
-    # Create model
-    # --------------------------------------------------
 
     model = BaselineModel(
         vocab_size=len(vocab),
@@ -340,9 +304,6 @@ def main() -> None:
 
     model = model.to(device)
 
-    # --------------------------------------------------
-    # Count trainable parameters
-    # --------------------------------------------------
 
     num_parameters = sum(
         parameter.numel()
@@ -355,9 +316,6 @@ def main() -> None:
         f"{num_parameters:,}"
     )
 
-    # --------------------------------------------------
-    # Loss and optimizer
-    # --------------------------------------------------
 
     criterion = nn.BCEWithLogitsLoss()
 
@@ -365,10 +323,6 @@ def main() -> None:
         model.parameters(),
         lr=LEARNING_RATE,
     )
-
-    # --------------------------------------------------
-    # Training history
-    # --------------------------------------------------
 
     history = {
         "epoch": [],
@@ -380,10 +334,6 @@ def main() -> None:
         "f1": [],
     }
 
-    # --------------------------------------------------
-    # Best model tracking
-    # --------------------------------------------------
-
     best_f1 = -1.0
     best_epoch = 0
 
@@ -391,10 +341,6 @@ def main() -> None:
         models_dir
         / "baseline_fold1_best.pt"
     )
-
-    # --------------------------------------------------
-    # Training
-    # --------------------------------------------------
 
     print("\nStarting training...\n")
 
@@ -411,22 +357,17 @@ def main() -> None:
             input_ids = input_ids.to(device)
             labels = labels.to(device)
 
-            # Clear gradients from previous batch
             optimizer.zero_grad()
 
-            # Forward pass
             logits = model(input_ids)
 
-            # Calculate loss
             loss = criterion(
                 logits,
                 labels,
             )
 
-            # Backpropagation
             loss.backward()
 
-            # Update model parameters
             optimizer.step()
 
             total_train_loss += (
@@ -434,15 +375,10 @@ def main() -> None:
                 * input_ids.size(0)
             )
 
-        # Average training loss
         train_loss = (
             total_train_loss
             / len(train_loader.dataset)
         )
-
-        # --------------------------------------------------
-        # Validation
-        # --------------------------------------------------
 
         validation_metrics = evaluate_model(
             model=model,
@@ -450,10 +386,6 @@ def main() -> None:
             criterion=criterion,
             device=device,
         )
-
-        # --------------------------------------------------
-        # Save history
-        # --------------------------------------------------
 
         history["epoch"].append(epoch)
 
@@ -481,10 +413,6 @@ def main() -> None:
             validation_metrics["f1"]
         )
 
-        # --------------------------------------------------
-        # Save best model
-        # --------------------------------------------------
-
         if validation_metrics["f1"] > best_f1:
 
             best_f1 = validation_metrics["f1"]
@@ -495,9 +423,6 @@ def main() -> None:
                 best_model_path,
             )
 
-        # --------------------------------------------------
-        # Print epoch results
-        # --------------------------------------------------
 
         print(
             f"Epoch {epoch}/{EPOCHS}"
@@ -535,10 +460,6 @@ def main() -> None:
 
         print("-" * 50)
 
-    # --------------------------------------------------
-    # Total training time
-    # --------------------------------------------------
-
     training_time = (
         time.time()
         - start_time
@@ -548,10 +469,6 @@ def main() -> None:
         f"\nTraining time: "
         f"{training_time:.2f} seconds"
     )
-
-    # --------------------------------------------------
-    # Best epoch information
-    # --------------------------------------------------
 
     print(
         f"Best epoch: {best_epoch}"
@@ -567,20 +484,12 @@ def main() -> None:
         f"{best_model_path}"
     )
 
-    # --------------------------------------------------
-    # Restore best model before measuring inference
-    # --------------------------------------------------
-
     model.load_state_dict(
         torch.load(
             best_model_path,
             map_location=device,
         )
     )
-
-    # --------------------------------------------------
-    # Measure inference time
-    # --------------------------------------------------
 
     inference_time, inference_per_sample = (
         measure_inference_time(
@@ -600,10 +509,6 @@ def main() -> None:
         f"{inference_per_sample * 1000:.4f} ms"
     )
 
-    # --------------------------------------------------
-    # Save training history
-    # --------------------------------------------------
-
     history_df = pd.DataFrame(history)
 
     history_path = (
@@ -620,10 +525,6 @@ def main() -> None:
         f"Training history saved to: "
         f"{history_path}"
     )
-
-    # --------------------------------------------------
-    # Save experiment summary
-    # --------------------------------------------------
 
     summary = {
         "model": "BaselineModel",
