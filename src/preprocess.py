@@ -81,12 +81,22 @@ def main() -> None:
 
     df = df.reset_index(drop=True)
 
+    OUTPUT_FILE = (
+        PROJECT_ROOT
+        / "data"
+        / "processed"
+        / "clean_sentence_dataset.csv"
+        )
+
     OUTPUT_FILE.parent.mkdir(
         parents=True,
         exist_ok=True
-    )
+        )
 
-    df.to_pickle(OUTPUT_FILE)
+    df.to_csv(
+        OUTPUT_FILE,
+        index=False,
+        )
 
     print("\nPreprocessing completed.")
     print(f"Final records: {len(df)}")
