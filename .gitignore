@@ -24,8 +24,15 @@ data/processed/
 # MLflow
 mlruns/
 
-# Generated results
-results/
+# Ignore trained model files
+results/models/*.pt
+
+# Keep experiment metrics and logs
+!results/metrics/
+!results/metrics/*.csv
+
+# Local MLflow database
+mlflow.db
 
 # Model checkpoints
 *.pt
