@@ -34,28 +34,37 @@ def main():
     plt.xlabel("Epoch"); plt.ylabel("Validation loss"); plt.legend()
     savefig(plots/"transformer_learning_curves.png")
 
-    best=pd.read_csv(metrics/"transformer2_oof_predictions.csv")
-    cm=confusion_matrix(best.label,best.prediction)
-    plt.figure(figsize=(5,5))
-    plt.imshow(cm)
-    plt.xticks([0,1],["0","1"]); plt.yticks([0,1],["0","1"])
-    plt.xlabel("Predicted"); plt.ylabel("Actual")
-    for i in range(2):
-        for j in range(2): plt.text(j,i,cm[i,j],ha="center",va="center")
-    savefig(plots/"transformer2_confusion_matrix.png")
+    plt.figure(figsize=(7,6))
+    for i in range(1,6):
+        df=pd.read_csv(metrics/f"transformer{i}_oof_predictions.csv")
 
-    fpr,tpr,_=roc_curve(best.label,best.probability)
-    plt.figure(figsize=(6,5))
-    plt.plot(fpr,tpr,label=f"AUC={auc(fpr,tpr):.3f}")
+        cm=confusion_matrix(df.label,df.prediction)
+        plt_cm=plt.figure(figsize=(5,5))
+        plt.imshow(cm)
+        plt.xticks([0,1],["0","1"]); plt.yticks([0,1],["0","1"])
+        plt.xlabel("Predicted"); plt.ylabel("Actual")
+        plt.title(f"Transformer {i}")
+        for r in range(2):
+            for c in range(2):
+                plt.text(c,r,cm[r,c],ha="center",va="center")
+        savefig(plots/f"transformer{i}_confusion_matrix.png")
+
+    plt.figure(figsize=(7,6))
+    for i in range(1,6):
+        df=pd.read_csv(metrics/f"transformer{i}_oof_predictions.csv")
+        fpr,tpr,_=roc_curve(df.label,df.probability)
+        plt.plot(fpr,tpr,label=f"Transformer {i} (AUC={auc(fpr,tpr):.3f})")
     plt.plot([0,1],[0,1],"--")
     plt.xlabel("False positive rate"); plt.ylabel("True positive rate"); plt.legend()
-    savefig(plots/"transformer2_roc_curve.png")
+    savefig(plots/"transformer_roc_comparison.png")
 
-    p,r,_=precision_recall_curve(best.label,best.probability)
-    plt.figure(figsize=(6,5))
-    plt.plot(r,p,label=f"AUC={auc(r,p):.3f}")
+    plt.figure(figsize=(7,6))
+    for i in range(1,6):
+        df=pd.read_csv(metrics/f"transformer{i}_oof_predictions.csv")
+        p,r,_=precision_recall_curve(df.label,df.probability)
+        plt.plot(r,p,label=f"Transformer {i} (AUC={auc(r,p):.3f})")
     plt.xlabel("Recall"); plt.ylabel("Precision"); plt.legend()
-    savefig(plots/"transformer2_pr_curve.png")
+    savefig(plots/"transformer_pr_comparison.png")
 
     print(f"Plots saved to: {plots}")
 
