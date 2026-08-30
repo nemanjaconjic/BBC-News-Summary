@@ -139,6 +139,10 @@ Pored osnovnih klasifikacionih metrika, tokom eksperimenata beleže se vreme tre
 
 Transformer 1 ima 197.378 trenabilnih parametara, dok Transformer konfiguracije 2–5 imaju po 394.754 trenabilnih parametara.
 
+## Računarski resursi
+
+Eksperimenti su izvršavani na CPU-u. Tokom evaluacije beleženi su vreme treniranja, vreme inferencije, veličina modela i broj trenabilnih parametara.
+
 ## Evaluacija modela
 
 Za poređenje svih pet Transformer konfiguracija generišu se:
