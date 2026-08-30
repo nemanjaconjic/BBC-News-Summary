@@ -1,2 +1,0 @@
-model,fold,seed,batch_size,epochs,learning_rate,embedding_dim,max_length,vocabulary_size,trainable_parameters,best_epoch,best_f1,training_time_seconds,inference_time_seconds,inference_ms_per_sentence
-BaselineModel,1,42,32,5,0.001,100,60,17411,1741201,4,0.5980861244019139,95.95871186256409,1.686310052871704,0.20346405078085233
