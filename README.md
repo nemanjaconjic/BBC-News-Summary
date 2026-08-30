@@ -135,7 +135,9 @@ Najveću prosečnu F1 vrednost ostvarila je konfiguracija **Transformer 2**, sa 
 F1 = 0.6812
 ```
 
-Pored osnovnih klasifikacionih metrika, tokom eksperimenata beleže se vreme treniranja, vreme inferencije i veličina modela.
+Pored osnovnih klasifikacionih metrika, tokom eksperimenata beleže se vreme treniranja, vreme inferencije, veličina modela i broj trenabilnih parametara.
+
+Transformer 1 ima 197.378 trenabilnih parametara, dok Transformer konfiguracije 2–5 imaju po 394.754 trenabilnih parametara.
 
 ## Evaluacija modela
 
@@ -144,12 +146,9 @@ Za poređenje svih pet Transformer konfiguracija generišu se:
 - poređenje F1 vrednosti
 - poređenje Accuracy, Precision, Recall i F1 metrika
 - krive učenja
-
-Za najbolju konfiguraciju, Transformer 2, dodatno se generišu:
-
-- matrica konfuzije
-- ROC kriva
-- Precision-Recall kriva
+- matrice konfuzije za svaku konfiguraciju
+- ROC krive
+- Precision-Recall krive
 
 Generisani grafikoni čuvaju se u direktorijumu:
 
@@ -164,6 +163,8 @@ results/metrics/
 ```
 
 Za svaku konfiguraciju čuvaju se rezultati unakrsne validacije, istorija treniranja i predikcije dobijene nad validacionim fold-ovima.
+
+Pored klasifikacionih metrika, poređenje modela obuhvata vreme treniranja, vreme inferencije, veličinu modela i broj trenabilnih parametara.
 
 ## MLflow praćenje eksperimenata
 
@@ -181,6 +182,7 @@ Tokom treniranja beleže se:
 - vreme treniranja
 - vreme inferencije
 - veličina modela
+- broj trenabilnih parametara
 
 Finalna evaluacija obuhvata pet konfiguracija i tri fold-a po konfiguraciji.
 
